@@ -1,6 +1,6 @@
 {% set name = "quilt" %}
 {% set pname = "quilt3" %}
-{% set version = "3.1.10" %}
+{% set version = "6.3.1" %}
 
 package:
   name: {{ pname|lower }}
@@ -8,55 +8,80 @@ package:
 
 source:
   url: https://github.com/quiltdata/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: 350e735b5fd01309127d838eaf4a2245d2036b1bb8a204c458582458b958239b
+  sha256: 50878c9a76c6e3a2306b4e995fbaa1bf667642cbf601e6377090125dd3daaae0
 
 build:
   number: 0
-  skip: true  # [py2k]
-  script: 
-      - cd api/python
-      - "{{ PYTHON }} -m pip install . --no-deps -vv"
+  skip: true  # [py<39]
+  script:
+    - cd api/python
+    - {{ PYTHON }} -m pip install . --no-deps --no-build-isolation --ignore-installed --no-cache-dir -vv
+  entry_points:
+    - quilt3=quilt3.main:main
 
 requirements:
   host:
     - python
     - pip
+    - setuptools
+    - wheel
   run:
     - python
-    - appdirs >=1.4.0
-    - aws-requests-auth >=0.4.2
-    - boto3 >=1.8.0 
-    - flask
-    - flask_cors
-    - flask_json
-    - jsonlines 1.2.0
-    - packaging >=16.8
-    - pandas >=0.19.2
-    - pyarrow >=0.14.1               #  as of 7/5/19: linux/circleci bugs on 0.14
-    - python-dateutil <=2.8.0
+    - boto3 >=1.21.7
+    - jsonschema >=3,<5
+    - jsonlines ==1.2.0
+    - platformdirs >=2
+    - pydantic >=2.0.0,<3.0.0
+    - pyyaml >=5.1
     - requests >=2.12.4
-    - urllib3 1.24                   #  required by requests
     - requests-futures ==1.0.0
-    - ruamel.yaml >=0.15.78
-    - tqdm >=4.26.0
-    - dnspython >=1.16.0
-
+    - tenacity >=5.1.1,!=8.4.0
+    - tqdm >=4.32
+  run_constrained:
+    - anndata >=0.8.0 # extra:anndata
+    - quilt3_local >=2,<3 # extra:catalog
+    - uvicorn >=0.15,<0.18 # extra:catalog
+    # pip install --dry-run "aiobotocore[boto3]>=2" will take only boto3 >=1.37.0,<1.37.2,
+    # The conda dependency solver will decide which version to take instead of the upstream extras versions.
+    #- aiobotocore >=2 # extra:catalog
+    - numpy >=1.14.0 # extra:pyarrow
+    - pandas >=0.19.2 # extra:pyarrow
+    - pyarrow >=0.14.1 # extra:pyarrow
 
 test:
   imports:
     - quilt3
+  source_files:
+    - api/python/tests
+  requires:
+    - pip
+    - pytest
+    - pytest-subtests
+    - numpy >=1.14.0 # extra:pyarrow
+    - pandas >=0.19.2 # extra:pyarrow
+    - pyarrow >=0.14.1 # extra:pyarrow
+    - responses
+  commands:
+    - pip check
+    - cd api/python
+    # FAILED tests/integration/test_packages.py::PackageTest::test_manifest - locale.Error: unsupported locale setting
+    - export LC_ALL=en_US.UTF-8  # [osx]
+    # No the anndata package available on the main channel
+    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
+    - pytest tests -vv --ignore=tests/test_formats.py -k "not test_get_boto3_session"
 
 about:
-  home: https://quiltdata.com/
-  license: Apache 2.0
+  home: https://www.quilt.bio/
+  license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
   summary: 'Quilt: where data comes together'
-
   description: |
-    Quilt is infrastructure for data-driven teams to store, version, deploy and iterate on models and data.
-    Data in Quilt are visual, discoverable, and reproducible.
+    Quilt connects teams to actionable data by simplifying data discovery, sharing, and analysis.
+    It's designed to serve data-driven organizations with powerful tools for managing data as code,
+    enabling rapid experimentation, and ensuring data integrity at scale.
   dev_url: https://github.com/quiltdata/quilt
+  doc_url: https://docs.quilt.bio/
 
 extra:
   recipe-maintainers:
