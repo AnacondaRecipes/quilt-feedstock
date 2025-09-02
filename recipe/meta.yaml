@@ -1,14 +1,14 @@
 {% set name = "quilt" %}
 {% set pname = "quilt3" %}
-{% set version = "6.3.1" %}
+{% set version = "7.0.0" %}
 
 package:
   name: {{ pname|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/quiltdata/{{ name }}/archive/{{ version }}.tar.gz
-  sha256: 50878c9a76c6e3a2306b4e995fbaa1bf667642cbf601e6377090125dd3daaae0
+  url: https://github.com/{{ name }}data/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
+  sha256: ab7c6a00a21fdab4426d8f203bd782ae8e3275013cc844ab79a3e2e7f115c37a
 
 build:
   number: 0
@@ -27,16 +27,16 @@ requirements:
     - wheel
   run:
     - python
-    - boto3 >=1.21.7
-    - jsonschema >=3,<5
-    - jsonlines ==1.2.0
     - platformdirs >=2
-    - pydantic >=2.0.0,<3.0.0
+    - boto3 >=1.21.7
+    - jsonlines ==1.2.0
     - pyyaml >=5.1
     - requests >=2.12.4
-    - requests-futures ==1.0.0
     - tenacity >=5.1.1,!=8.4.0
     - tqdm >=4.32
+    - requests-futures ==1.0.0
+    - jsonschema >=3,<5
+    - pydantic >=2.0.0,<3.0.0
   run_constrained:
     - anndata >=0.8.0 # extra:anndata
     - quilt3_local >=2,<3 # extra:catalog
@@ -71,7 +71,7 @@ test:
     - pytest tests -vv --ignore=tests/test_formats.py -k "not test_get_boto3_session"
 
 about:
-  home: https://www.quilt.bio/
+  home: https://www.quilt.bio
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
@@ -81,7 +81,7 @@ about:
     It's designed to serve data-driven organizations with powerful tools for managing data as code,
     enabling rapid experimentation, and ensuring data integrity at scale.
   dev_url: https://github.com/quiltdata/quilt
-  doc_url: https://docs.quilt.bio/
+  doc_url: https://docs.quilt.bio
 
 extra:
   recipe-maintainers:
