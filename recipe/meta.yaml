@@ -23,8 +23,7 @@ requirements:
   host:
     - python
     - pip
-    - setuptools
-    - wheel
+    - uv-build >=0.8.15,<0.9.0
   run:
     - python
     - platformdirs >=2
@@ -37,16 +36,20 @@ requirements:
     - requests-futures ==1.0.0
     - jsonschema >=3,<5
     - pydantic >=2.0.0,<3.0.0
+    - awscrt >=0.31.0
   run_constrained:
-    - anndata >=0.8.0  # extra:anndata
-    - quilt3_local >=2,<3  # extra:catalog
-    - uvicorn >=0.15,<0.18  # extra:catalog
+    # optional pyarrow
+    - numpy >=1.14.0
+    - pandas >=0.19.2
+    - pyarrow >=0.14.1
+    # optional anndata
+    - anndata >=0.8.0
+    # optional catalog
+    - quilt3_local >=2,<3
+    - uvicorn >=0.15,<0.18
     # pip install --dry-run "aiobotocore[boto3]>=2" will take only boto3 >=1.37.0,<1.37.2,
     # The conda dependency solver will decide which version to take instead of the upstream extras versions.
-    #- aiobotocore >=2 # extra:catalog
-    - numpy >=1.14.0  # extra:pyarrow
-    - pandas >=0.19.2  # extra:pyarrow
-    - pyarrow >=0.14.1  # extra:pyarrow
+    #- aiobotocore >=2
 
 test:
   imports:
@@ -57,9 +60,9 @@ test:
     - pip
     - pytest
     - pytest-subtests
-    - numpy >=1.14.0  # extra:pyarrow
-    - pandas >=0.19.2  # extra:pyarrow
-    - pyarrow >=0.14.1  # extra:pyarrow
+    - numpy
+    - pandas
+    - pyarrow
     - responses
   commands:
     - pip check
@@ -67,15 +70,15 @@ test:
     # FAILED tests/integration/test_packages.py::PackageTest::test_manifest - locale.Error: unsupported locale setting
     - export LC_ALL=en_US.UTF-8  # [osx]
     # No the anndata package available on the main channel
-    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied.
-    - pytest tests -vv --ignore=tests/test_formats.py -k "not test_get_boto3_session"
+    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
+    - pytest tests -v
 
 about:
   home: https://www.quilt.bio
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
-  summary: "Quilt: where data comes together"
+  summary: 'Quilt: where data comes together'
   description: |
     Quilt connects teams to actionable data by simplifying data discovery, sharing, and analysis.
     It's designed to serve data-driven organizations with powerful tools for managing data as code,
