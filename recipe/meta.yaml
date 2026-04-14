@@ -1,6 +1,6 @@
 {% set name = "quilt" %}
 {% set pname = "quilt3" %}
-{% set version = "7.0.0" %}
+{% set version = "7.3.0" %}
 
 package:
   name: {{ pname|lower }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/{{ name }}data/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: ab7c6a00a21fdab4426d8f203bd782ae8e3275013cc844ab79a3e2e7f115c37a
+  sha256: 27ca5580093905a7ce24d54043d649a0c64aad0b04dca7353348342f23e5bbe1
 
 build:
   number: 0
@@ -38,15 +38,15 @@ requirements:
     - jsonschema >=3,<5
     - pydantic >=2.0.0,<3.0.0
   run_constrained:
-    - anndata >=0.8.0 # extra:anndata
-    - quilt3_local >=2,<3 # extra:catalog
-    - uvicorn >=0.15,<0.18 # extra:catalog
+    - anndata >=0.8.0  # extra:anndata
+    - quilt3_local >=2,<3  # extra:catalog
+    - uvicorn >=0.15,<0.18  # extra:catalog
     # pip install --dry-run "aiobotocore[boto3]>=2" will take only boto3 >=1.37.0,<1.37.2,
     # The conda dependency solver will decide which version to take instead of the upstream extras versions.
     #- aiobotocore >=2 # extra:catalog
-    - numpy >=1.14.0 # extra:pyarrow
-    - pandas >=0.19.2 # extra:pyarrow
-    - pyarrow >=0.14.1 # extra:pyarrow
+    - numpy >=1.14.0  # extra:pyarrow
+    - pandas >=0.19.2  # extra:pyarrow
+    - pyarrow >=0.14.1  # extra:pyarrow
 
 test:
   imports:
@@ -57,9 +57,9 @@ test:
     - pip
     - pytest
     - pytest-subtests
-    - numpy >=1.14.0 # extra:pyarrow
-    - pandas >=0.19.2 # extra:pyarrow
-    - pyarrow >=0.14.1 # extra:pyarrow
+    - numpy >=1.14.0  # extra:pyarrow
+    - pandas >=0.19.2  # extra:pyarrow
+    - pyarrow >=0.14.1  # extra:pyarrow
     - responses
   commands:
     - pip check
@@ -67,7 +67,7 @@ test:
     # FAILED tests/integration/test_packages.py::PackageTest::test_manifest - locale.Error: unsupported locale setting
     - export LC_ALL=en_US.UTF-8  # [osx]
     # No the anndata package available on the main channel
-    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
+    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied.
     - pytest tests -vv --ignore=tests/test_formats.py -k "not test_get_boto3_session"
 
 about:
@@ -75,7 +75,7 @@ about:
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
-  summary: 'Quilt: where data comes together'
+  summary: "Quilt: where data comes together"
   description: |
     Quilt connects teams to actionable data by simplifying data discovery, sharing, and analysis.
     It's designed to serve data-driven organizations with powerful tools for managing data as code,
