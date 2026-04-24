@@ -71,7 +71,7 @@ test:
     - export LC_ALL=en_US.UTF-8  # [osx]
     # No the anndata package available on the main channel
     # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
-    - pytest tests -v
+    - pytest -vv --ignore=tests/test_formats.py tests
 
 about:
   home: https://www.quilt.bio
