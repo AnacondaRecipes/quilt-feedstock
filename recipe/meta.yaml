@@ -74,8 +74,6 @@ test:
     - cd api/python
     # FAILED tests/integration/test_packages.py::PackageTest::test_manifest - locale.Error: unsupported locale setting
     - export LC_ALL=en_US.UTF-8  # [osx]
-    
-    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
     - pytest -vv {{ skip_tests }} tests
 
 about:
