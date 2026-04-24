@@ -51,6 +51,9 @@ requirements:
     # The conda dependency solver will decide which version to take instead of the upstream extras versions.
     #- aiobotocore >=2
 
+{% set skip_tests = "" %}
+{% set skip_tests = skip_tests + " --ignore=--ignore=tests/test_formats.py" %}
+
 test:
   imports:
     - quilt3
@@ -71,7 +74,7 @@ test:
     - export LC_ALL=en_US.UTF-8  # [osx]
     # No the anndata package available on the main channel
     # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
-    - pytest -vv --ignore=tests/test_formats.py tests
+    - pytest -vv {{ skip_tests }} tests
 
 about:
   home: https://www.quilt.bio
