@@ -56,6 +56,8 @@ requirements:
 {% set skip_tests = skip_tests + " --ignore=tests/test_formats.py" %}
 # Fails on CI due to different AWS credentials setup
 {% set skip_tests = skip_tests + " --deselect=tests/test_s3clientprovider.py::test_client" %}
+# Fails on CI (specific builders) due to different filesystem timestamp granularity/resolution than expected
+{% set skip_tests = skip_tests + " --deselect=tests/integration/test_packages.py::PackageTest::test_install" %}  # [linux and aarch64 and py==312]
 
 test:
   imports:
