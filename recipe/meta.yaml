@@ -1,6 +1,6 @@
 {% set name = "quilt" %}
 {% set pname = "quilt3" %}
-{% set version = "7.0.0" %}
+{% set version = "7.3.0" %}
 
 package:
   name: {{ pname|lower }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://github.com/{{ name }}data/{{ name }}/archive/refs/tags/{{ version }}.tar.gz
-  sha256: ab7c6a00a21fdab4426d8f203bd782ae8e3275013cc844ab79a3e2e7f115c37a
+  sha256: 27ca5580093905a7ce24d54043d649a0c64aad0b04dca7353348342f23e5bbe1
 
 build:
   number: 0
@@ -23,8 +23,7 @@ requirements:
   host:
     - python
     - pip
-    - setuptools
-    - wheel
+    - uv-build >=0.8.15,<0.9.0
   run:
     - python
     - platformdirs >=2
@@ -37,16 +36,29 @@ requirements:
     - requests-futures ==1.0.0
     - jsonschema >=3,<5
     - pydantic >=2.0.0,<3.0.0
+    - awscrt >=0.31.0
   run_constrained:
-    - anndata >=0.8.0 # extra:anndata
-    - quilt3_local >=2,<3 # extra:catalog
-    - uvicorn >=0.15,<0.18 # extra:catalog
+    # pyarrow
+    - numpy >=1.14.0
+    - pandas >=0.19.2
+    - pyarrow >=0.14.1
+    # anndata
+    - anndata >=0.8.0
+    # catalog
+    - quilt3_local >=2,<3
+    - uvicorn >=0.15,<0.18
     # pip install --dry-run "aiobotocore[boto3]>=2" will take only boto3 >=1.37.0,<1.37.2,
     # The conda dependency solver will decide which version to take instead of the upstream extras versions.
-    #- aiobotocore >=2 # extra:catalog
-    - numpy >=1.14.0 # extra:pyarrow
-    - pandas >=0.19.2 # extra:pyarrow
-    - pyarrow >=0.14.1 # extra:pyarrow
+    #- aiobotocore >=2
+
+{% set skip_tests = "" %}
+# No the anndata package available on the main channel
+{% set skip_tests = skip_tests + " --ignore=tests/test_formats.py" %}
+# Fails on CI due to different AWS credentials setup
+{% set skip_tests = skip_tests + " --deselect=tests/test_s3clientprovider.py::test_client" %}
+# May fails on CI (intermittently, on specific platforms) due to different filesystem timestamp granularity/resolution than expected
+{% set skip_tests = skip_tests + " --deselect=tests/integration/test_packages.py::PackageTest::test_install" %}  # [linux and aarch64]
+{% set skip_tests = skip_tests + " --deselect=tests/integration/test_packages.py::PackageTestV2::test_install" %}  # [linux and aarch64]
 
 test:
   imports:
@@ -57,18 +69,16 @@ test:
     - pip
     - pytest
     - pytest-subtests
-    - numpy >=1.14.0 # extra:pyarrow
-    - pandas >=0.19.2 # extra:pyarrow
-    - pyarrow >=0.14.1 # extra:pyarrow
+    - numpy
+    - pandas
+    - pyarrow
     - responses
   commands:
     - pip check
     - cd api/python
     # FAILED tests/integration/test_packages.py::PackageTest::test_manifest - locale.Error: unsupported locale setting
     - export LC_ALL=en_US.UTF-8  # [osx]
-    # No the anndata package available on the main channel
-    # Skip test_get_boto3_session because of requests.exceptions.MissingSchema: Invalid URL 'None/api/auth/get_credentials': No scheme supplied. 
-    - pytest tests -vv --ignore=tests/test_formats.py -k "not test_get_boto3_session"
+    - pytest -vv {{ skip_tests }} tests
 
 about:
   home: https://www.quilt.bio
